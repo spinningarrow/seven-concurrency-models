@@ -14,7 +14,9 @@
             [compojure.core     :refer :all]
             [compojure.handler  :refer [api]]
             [ring.util.response :refer [charset response]]
-            [ring.adapter.jetty :refer [run-jetty]]))
+            [ring.adapter.jetty :refer [run-jetty]]
+            [ring.middleware.reload :refer [wrap-reload]]
+            [clojure.tools.reader.edn :as edn]))
 
 (defn create-session []
   (let [snippets (repeatedly promise)
@@ -26,21 +28,23 @@
   (deliver (nth (:snippets session) n) text))
 
 (defn get-translation [session n]
-  @(nth @(:translations session) n))
+  (deref (nth @(:translations session) n) 1000 "????"))
 
 (defroutes app-routes
   (POST "/session/create" []
     (response (str (create-session))))
-	
+
   (context "/session/:session-id" [session-id]
     (let [session (get-session (edn/read-string session-id))]
       (routes
         (PUT "/snippet/:n" [n :as {:keys [body]}]
           (accept-snippet session (edn/read-string n) (slurp body))
           (response "OK"))
-		  
+
         (GET "/translation/:n" [n]
           (response (get-translation session (edn/read-string n))))))))
 
 (defn -main [& args]
-  (run-jetty (wrap-charset (api app-routes)) {:port 3000}))
+  (run-jetty (wrap-reload (wrap-charset (api app-routes))) {:port 3000}))
+
+(deref (nth (map translate (map deref ((get-session 1) :snippets))) 0) 1000 "??????????")

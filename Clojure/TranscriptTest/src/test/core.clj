@@ -15,9 +15,9 @@
 
 (defn mk-url
   ([path]
-    (str endpoint path))
+   (str endpoint path))
   ([session-id path]
-    (mk-url (str "/session/" session-id path))))
+   (mk-url (str "/session/" session-id path))))
 
 (defn deliver-transcript [transcript]
   (let [session-id (:body (client/post (mk-url "/session/create")))]
@@ -32,8 +32,6 @@
 (def jabberwocky-session (future (deliver-transcript jabberwocky)))
 (def potato-session (future (deliver-transcript potato)))
 
-(future (print-translation @jabberwocky-session))
-(future (print-translation @potato-session))
-
 (defn -main [& args]
-  nil)
+  (time (future (print-translation @jabberwocky-session)))
+  (future (print-translation @potato-session)))

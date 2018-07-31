@@ -7,8 +7,10 @@
 ; Visit http://www.pragmaticprogrammer.com/titles/pb7con for more book information.
 ;---
 (defproject tournament-server "1.0"
-  :dependencies [[org.clojure/clojure "1.4.0"]
+  :dependencies [[org.clojure/clojure "1.5.0"]
                  [compojure "1.1.5"]
                  [ring/ring-jetty-adapter "1.1.8"]
+                 [ring/ring-devel "1.6.3"]
                  [cheshire "5.0.1"]]
   :main server.core)
+

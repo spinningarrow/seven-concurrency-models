@@ -11,9 +11,11 @@
             [compojure.handler      :refer [site]]
             [ring.util.response     :refer [response status]]
             [ring.adapter.jetty     :refer [run-jetty]]
-            [cheshire.core          :as json]))
+            [cheshire.core          :as json]
+            [ring.middleware.reload :refer [wrap-reload]]))
 
-(def players (atom ())) 
+;(def players (atom ()))
+(def players (atom ()))
 
 (defn list-players []
   (response (json/encode @players))) 
@@ -22,8 +24,14 @@
   (swap! players conj player-name) 
   (status (response "") 201))
 
-(defroutes app-routes 
+(defn remove-player [player-name]
+  (swap! players (fn [p] (remove #(= player-name %1) p)))
+  (status (response "") 200))
+
+(defroutes app-routes
   (GET "/players" [] (list-players))
-  (PUT "/players/:player-name" [player-name] (create-player player-name)))
+  (PUT "/players/:player-name" [player-name] (create-player player-name))
+  (DELETE "/players/:player-name" [player-name] (remove-player player-name)))
+
 (defn -main [& args]
-  (run-jetty (site app-routes) {:port 3000})) 
+  (run-jetty (site (wrap-reload app-routes)) {:port 3000}))
