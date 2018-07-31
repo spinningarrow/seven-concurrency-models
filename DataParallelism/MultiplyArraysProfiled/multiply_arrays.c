@@ -30,9 +30,9 @@ char* read_source(const char* filename) {
   return program;
 }
 
-void random_fill(cl_float array[], size_t size) {
+void random_fill(char array[], size_t size) {
   for (int i = 0; i < size; ++i)
-    array[i] = (cl_float)rand() / RAND_MAX;
+    array[i] = (char)rand() / RAND_MAX;
 }
 
 int main() {
@@ -55,18 +55,18 @@ int main() {
 
   cl_kernel kernel = clCreateKernel(program, "multiply_arrays", NULL);
 
-  cl_float a[NUM_ELEMENTS], b[NUM_ELEMENTS];
+  char a[NUM_ELEMENTS], b[NUM_ELEMENTS];
   random_fill(a, NUM_ELEMENTS);
   random_fill(b, NUM_ELEMENTS);
 
   uint64_t startGPU = mach_absolute_time();
 
   cl_mem inputA = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-    sizeof(cl_float) * NUM_ELEMENTS, a, NULL);
+    sizeof(char) * NUM_ELEMENTS, a, NULL);
   cl_mem inputB = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-    sizeof(cl_float) * NUM_ELEMENTS, b, NULL);
+    sizeof(char) * NUM_ELEMENTS, b, NULL);
   cl_mem output = clCreateBuffer(context, CL_MEM_WRITE_ONLY,
-    sizeof(cl_float) * NUM_ELEMENTS, NULL, NULL);
+    sizeof(char) * NUM_ELEMENTS, NULL, NULL);
 
   clSetKernelArg(kernel, 0, sizeof(cl_mem), &inputA);
   clSetKernelArg(kernel, 1, sizeof(cl_mem), &inputB);
@@ -77,8 +77,8 @@ int main() {
   clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &work_units, 
     NULL, 0, NULL, &timing_event);
 	
-  cl_float results[NUM_ELEMENTS];
-  clEnqueueReadBuffer(queue, output, CL_TRUE, 0, sizeof(cl_float) * NUM_ELEMENTS,
+  char results[NUM_ELEMENTS];
+  clEnqueueReadBuffer(queue, output, CL_TRUE, 0, sizeof(char) * NUM_ELEMENTS,
     results, 0, NULL, NULL);
   uint64_t endGPU = mach_absolute_time();
   printf("Total (GPU): %lu ns\n\n", (unsigned long)(endGPU - startGPU));

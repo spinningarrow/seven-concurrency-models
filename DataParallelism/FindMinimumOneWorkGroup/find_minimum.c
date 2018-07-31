@@ -1,14 +1,14 @@
 /***
  * Excerpted from "Seven Concurrency Models in Seven Weeks",
  * published by The Pragmatic Bookshelf.
- * Copyrights apply to this code. It may not be used to create training material, 
+ * Copyrights apply to this code. It may not be used to create training material,
  * courses, books, articles, and the like. Contact us if you are in doubt.
- * We make no guarantees that this code is fit for any purpose. 
+ * We make no guarantees that this code is fit for any purpose.
  * Visit http://www.pragmaticprogrammer.com/titles/pb7con for more book information.
 ***/
 #ifdef __APPLE__
 #include <OpenCL/cl.h>
-#else  
+#else
 #include <CL/cl.h>
 #endif
 
@@ -17,7 +17,7 @@
 #include <math.h>
 #include <float.h>
 
-#define NUM_VALUES 64
+#define NUM_VALUES 512
 
 #define CHECK_STATUS(s) do { \
     cl_int ss = (s); \
@@ -90,7 +90,7 @@ int main() {
   CHECK_STATUS(clSetKernelArg(kernel, 2, sizeof(cl_float) * NUM_VALUES, NULL));
 
   size_t work_units[] = {NUM_VALUES};
-  CHECK_STATUS(clEnqueueNDRangeKernel(queue, kernel, 1, NULL, work_units, 
+  CHECK_STATUS(clEnqueueNDRangeKernel(queue, kernel, 1, NULL, work_units,
     work_units, 0, NULL, NULL));
 
   cl_float result;
@@ -111,5 +111,6 @@ int main() {
   if (acc != result)
     fprintf(stderr, "Error: %f != %f", acc, result);
 
+  printf("%f and %f", result, acc);
   return 0;
 }
