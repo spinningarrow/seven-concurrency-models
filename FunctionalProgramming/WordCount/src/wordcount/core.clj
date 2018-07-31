@@ -10,17 +10,25 @@
   (:require [wordcount.pages :refer :all]
             [wordcount.words :refer :all]))
 
+(def path "/Users/sahil/Downloads/wiki/simplewiki-20170820-pages-meta-current.xml")
+
 (defn count-words-sequential [pages]
-  (frequencies (mapcat get-words pages)))
+  (frequencies (mapcat get-words (remove nil? pages))))
 
 (defn count-words-parallel [pages]
   (reduce (partial merge-with +)
-    (pmap #(frequencies (get-words %)) pages)))
+    (pmap #(frequencies (get-words %)) (remove nil? pages))))
 
 (defn count-words [pages]
   (reduce (partial merge-with +)
     (pmap count-words-sequential (partition-all 100 pages))))
 
 (defn -main [& args]
-  (time (count-words (take 100000 (get-pages "enwiki.xml"))))
+  (time (count-words (take 100000 (get-pages path))))
   (shutdown-agents))
+
+(+ 1 2 3 4)
+
+(def pinky (promise))
+(future (println "I promised that I would" @pinky))
+(deliver pinky "see you today")

@@ -54,7 +54,11 @@
 
 (defroutes app-routes
   (POST "/translate" [:as {:keys [body]}]
-    (response (get translations (slurp body) "Untranslateable"))))
+    (Thread/sleep 5000)
+    (let [b (slurp body)]
+      (print b)
+      ;; (response b))))
+      (response (get translations b "Untranslateable")))))
 
 (defn wrap-charset [handler]
   (fn [req] (charset (handler req) "UTF-8")))
